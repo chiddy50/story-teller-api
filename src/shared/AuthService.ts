@@ -1,0 +1,48 @@
+import bcrpyt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { IJwtPayload } from "./Interface";
+
+export interface IAuth {
+  hash(payload: string): Promise<string>;
+  compare(hash: string, payload: string): Promise<boolean>;
+  encrypt(payload: IJwtPayload): Promise<string>;
+  decrypt(token: string): Promise<IJwtPayload>;
+}
+
+export class Auth implements IAuth {
+  private secret: Buffer;
+  constructor() {
+    this.secret = Buffer.from(process.env.AUTH_SECRET as string, "utf-8");
+  }
+
+  public async hash(payload: string): Promise<string> {
+    const hashed = await bcrpyt.hash(payload, 10);
+    return hashed;
+  }
+
+  public async compare(hash: string, payload: string): Promise<boolean> {
+    const matched = await bcrpyt.compare(hash, payload);
+    return matched;
+  }
+
+  public async encrypt(payload: IJwtPayload): Promise<string> {
+    const token = jwt.sign(payload, this.secret, { expiresIn: "1h" });
+    return token;
+  }
+
+  public async decrypt(token: string): Promise<IJwtPayload> {
+    try {
+      const decoded: IJwtPayload = jwt.verify(
+        token,
+        this.secret
+      ) as IJwtPayload;
+      return decoded;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error("An unknown error occurred.");
+      }
+    }
+  }
+}
