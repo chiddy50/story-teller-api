@@ -11,8 +11,8 @@ export interface IAuth {
 
 export class Auth implements IAuth {
   private secret: Buffer;
-  constructor() {
-    this.secret = Buffer.from(process.env.AUTH_SECRET as string, "utf-8");
+  constructor(secret: string) {
+    this.secret = Buffer.from(secret, "utf-8");
   }
 
   public async hash(payload: string): Promise<string> {

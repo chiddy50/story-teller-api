@@ -1,9 +1,8 @@
 // userRouter.ts
 import express, { Router, Request, Response } from "express";
+import { userServiceFactory } from "../factories/UserServiceFactory";
 
 const UserController: Router = express.Router();
-UserController.get("/", (req: Request, res: Response) => {
-  res.send("GET /users");
-});
+UserController.get("/", userServiceFactory.register);
 
 export default UserController;

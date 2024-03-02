@@ -1,6 +1,8 @@
 // app.ts
-import express, { Request, Response } from "express";
+import express, {  } from "express";
 import UserController from "./controllers/User";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 const port = 3000;
