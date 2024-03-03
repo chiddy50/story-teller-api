@@ -8,6 +8,8 @@ import * as R from "ramda";
 export interface IUserService {
   register(req: Request, res: Response): Promise<void>;
   login(req: Request, res: Response): Promise<void>;
+  getUserById(req: Request, res: Response): Promise<void>;
+  getUserByEmail(req: Request, res: Response): Promise<void>;
 }
 export class UserService implements IUserService {
   private userRepo: IBase;
@@ -87,7 +89,6 @@ export class UserService implements IUserService {
           id: true,
           name: true,
           email: true,
-          role: true,
           publicKey: true,
           password: true,
         },
@@ -114,5 +115,45 @@ export class UserService implements IUserService {
     }
   };
 
-  
+  public getUserById = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const getUser: any = await this.userRepo.getUnique({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          publicKey: true,
+        },
+      });
+      if (!getUser) throw new Error("Unable to get user");
+      res.status(201).json({ data: getUser, error: false, message: "success" });
+    } catch (error) {
+      this.errorService.handleErrorResponse(error)(res);
+    }
+  };
+  public getUserByEmail = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      const { email } = req.params;
+      const getUser: any = await this.userRepo.getUnique({
+        where: { email },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          publicKey: true,
+        },
+      });
+      if (!getUser) throw new Error("Unable to get user");
+      res.status(201).json({ data: getUser, error: false, message: "success" });
+    } catch (error) {
+      this.errorService.handleErrorResponse(error)(res);
+    }
+  };
 }

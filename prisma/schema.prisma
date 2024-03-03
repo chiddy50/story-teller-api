@@ -94,5 +94,5 @@ model User {
   challenges            Challenge[]
   transactions          Transaction[]
   stories               Story[]
-  role                  UserRole @default(ADMIN)
+  role                  UserRole? @default(ADMIN)
 }
