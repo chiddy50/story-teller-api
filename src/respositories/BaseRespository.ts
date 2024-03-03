@@ -17,7 +17,6 @@ export class Base implements IBase {
   }
 
   public create = async (data: object): Promise<object> => {
-    console.log(this.modelName + '::create', data);
     return await this.db[this.modelName].create(data);
   };
 
@@ -30,7 +29,6 @@ export class Base implements IBase {
   };
 
   public getUnique = async (filter: object): Promise<object> => {
-    console.log(this.modelName + "::create", filter);
     return await this.db[this.modelName].findUnique(filter);
   };
 
