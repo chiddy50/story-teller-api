@@ -1,6 +1,5 @@
-import { Auth } from "../shared/AuthService";
+import { Auth, IAuth } from "../shared/AuthService";
 
 const secret = (process.env.AUTH_SECRET as string) || "test";
-console.log(secret);
 
-export const authService = new Auth(secret);
+export const authService: IAuth = new Auth(secret);

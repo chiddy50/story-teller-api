@@ -15,22 +15,23 @@ export class Auth implements IAuth {
     this.secret = Buffer.from(secret, "utf-8");
   }
 
-  public async hash(payload: string): Promise<string> {
+  public hash = async (payload: string): Promise<string> => {
     const hashed = await bcrpyt.hash(payload, 10);
+    console.log(hashed);
     return hashed;
-  }
+  };
 
-  public async compare(hash: string, payload: string): Promise<boolean> {
+  public compare = async (hash: string, payload: string): Promise<boolean> => {
     const matched = await bcrpyt.compare(hash, payload);
     return matched;
-  }
+  };
 
-  public async encrypt(payload: IJwtPayload): Promise<string> {
+  public encrypt = async (payload: IJwtPayload): Promise<string> => {
     const token = jwt.sign(payload, this.secret, { expiresIn: "1h" });
     return token;
-  }
+  };
 
-  public async decrypt(token: string): Promise<IJwtPayload> {
+  public decrypt = async (token: string): Promise<IJwtPayload> => {
     try {
       const decoded: IJwtPayload = jwt.verify(
         token,
@@ -44,5 +45,5 @@ export class Auth implements IAuth {
         throw new Error("An unknown error occurred.");
       }
     }
-  }
+  };
 }

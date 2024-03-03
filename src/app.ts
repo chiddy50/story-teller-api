@@ -9,7 +9,7 @@ const port = 3000;
 
 app.use(express.json());
 
-app.get("/", UserController);
+app.use("/", UserController);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

@@ -16,27 +16,29 @@ export class Base implements IBase {
     this.modelName = modelName;
   }
 
-  public async create(data: object): Promise<object> {
+  public create = async (data: object): Promise<object> => {
+    console.log(this.modelName + '::create', data);
     return await this.db[this.modelName].create(data);
-  }
+  };
 
-  public async update(data: object): Promise<object> {
+  public update = async (data: object): Promise<object> => {
     return await this.db[this.modelName].update(data);
-  }
+  };
 
-  public async delete(filter: object): Promise<object> {
+  public delete = async (filter: object): Promise<object> => {
     return await this.db[this.modelName].delete(filter);
-  }
+  };
 
-  public async getUnique(filter: object): Promise<object> {
+  public getUnique = async (filter: object): Promise<object> => {
+    console.log(this.modelName + "::create", filter);
     return await this.db[this.modelName].findUnique(filter);
-  }
+  };
 
-  public async get(filter: object): Promise<object> {
+  public get = async (filter: object): Promise<object> => {
     return await this.db[this.modelName].findFirst(filter);
-  }
+  };
 
-  public async getAll(filter: object): Promise<Array<object>> {
+  public getAll = async (filter: object): Promise<Array<object>> => {
     return await this.db[this.modelName].findMany(filter);
-  }
+  };
 }
