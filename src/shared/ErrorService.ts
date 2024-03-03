@@ -9,6 +9,8 @@ export class ErrorService implements IErrorService {
     return async (res: Response) => {
       if (error instanceof Error) {
         res.status(400).json({ message: error.message });
+      } else if (typeof error === "string") {
+        res.status(400).json({ message: error });
       } else {
         res.status(400).json({ message: "Unable to process request" });
       }

@@ -1,6 +1,6 @@
 export interface IBase {
   create(data: object): Promise<object>;
-  update(filter: object, data: object): Promise<object>;
+  update(data: object): Promise<object>;
   delete(filter: object): Promise<object>;
   getUnique(filter: object): Promise<object>;
   get(filter: object): Promise<object>;
