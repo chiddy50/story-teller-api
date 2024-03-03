@@ -17,7 +17,6 @@ export class Auth implements IAuth {
 
   public hash = async (payload: string): Promise<string> => {
     const hashed = await bcrpyt.hash(payload, 10);
-    console.log(hashed);
     return hashed;
   };
 
