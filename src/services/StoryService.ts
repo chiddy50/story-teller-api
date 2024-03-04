@@ -11,6 +11,8 @@ export interface IStoryService {
 export class StoryService implements IStoryService {
   constructor(
     private storyRepo: IBase,
+    private challengeRepo: IBase,
+    private userRepo: IBase,
     private errorService: IErrorService
   ) {}
 
@@ -18,11 +20,42 @@ export class StoryService implements IStoryService {
     try {
       const data: any = req.body;
       const user: IJwtPayload = req.user as IJwtPayload;
-      const challenge: any = await this.storyRepo.create({
-        userId: user.userId,
-        ...data,
+
+      const getChallenge: any = await this.challengeRepo.get({
+        where: { id: data.challengeId },
       });
-      res.status(201).json({ challenge, error: false, message: "success" });
+
+      if (!getChallenge) throw new Error("Challenge not found");
+
+      if (data.userAddress) {
+        await this.userRepo.update({
+          where: { id: user.userId },
+          data: {
+            publicKey: data.userAddress,
+          },
+        });
+      } else {
+        const getUser = this.userRepo.getUnique({
+          where: {
+            id: user.userId,
+            NOT: {
+              publicKey: null,
+            },
+          },
+        });
+
+        if (!getUser) throw new Error("user not found");
+      }
+
+      const newStory: any = await this.storyRepo.create({
+        data: {
+          userId: user.userId,
+          challengeId: data.challengeId,
+          story: data.story,
+          projectId: getChallenge?.projectId,
+        },
+      });
+      res.status(201).json({ newStory, error: false, message: "success" });
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);
     }
@@ -32,33 +65,72 @@ export class StoryService implements IStoryService {
     try {
       const { id } = req.params;
       if (!id) throw new Error("Invalid id");
-      const challenge: any = await this.storyRepo.get({
+      const story: any = await this.storyRepo.get({
         where: {
-          id,
+          id: id,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              publicKey: true,
+            },
+          },
+          challenge: true,
         },
       });
 
-      res.status(201).json({ challenge, error: false, message: "success" });
+      if (!story) throw new Error("Story not found");
+
+      const first_place_story: any = await this.storyRepo.get({
+        where: {
+          challengeId: story.challengeId,
+          award: "FIRST",
+        },
+      });
+
+      const second_place_story: any = await this.storyRepo.get({
+        where: {
+          challengeId: story.challengeId,
+          award: "SECOND",
+        },
+      });
+
+      const third_place_story: any = await this.storyRepo.get({
+        where: {
+          challengeId: story.challengeId,
+          award: "THIRD",
+        },
+      });
+
+      let response = {
+        submission: story,
+        first_place_story,
+        second_place_story,
+        third_place_story,
+      };
+
+      res.status(201).json({ response, error: false, message: "success" });
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);
     }
   };
 
-  public getAll = async (req: Request, res: Response): Promise<void> => {
+  public getAll = async (req: CustomRequest, res: Response): Promise<void> => {
     try {
-      const { id } = req.query;
-      let filter: object = {};
-      if (id) {
-        filter = { userId: id };
-      }
-      const challenges: any = await this.storyRepo.getAll({
-        where: filter,
+      const user: IJwtPayload = req.user as IJwtPayload;
+      const stories: any = await this.storyRepo.getAll({
+        where: {
+          userId: user.userId,
+        },
         include: {
-          stories: true,
+          challenge: true,
         },
       });
 
-      res.status(201).json({ challenges, error: false, message: "success" });
+      res.status(201).json({ stories, error: false, message: "success" });
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);
     }
@@ -70,20 +142,18 @@ export class StoryService implements IStoryService {
       const updatedFields = req.body;
       if (!id) throw new Error("Invalid id");
 
-      const challenge = await this.storyRepo.get({
-        where: { projectId: id },
+      const story = await this.storyRepo.get({
+        where: { id },
       });
 
-      if (!challenge) throw new Error("Challenge not found");
+      if (!story) throw new Error("Challenge not found");
 
-      const updateChallenge: any = await this.storyRepo.update({
+      const updateStory: any = await this.storyRepo.update({
         where: { id },
         data: updatedFields,
       });
 
-      res
-        .status(201)
-        .json({ updateChallenge, error: false, message: "success" });
+      res.status(201).json({ updateStory, error: false, message: "success" });
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);
     }
