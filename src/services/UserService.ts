@@ -134,6 +134,7 @@ export class UserService implements IUserService {
       this.errorService.handleErrorResponse(error)(res);
     }
   };
+  
   public getUserByEmail = async (
     req: Request,
     res: Response
