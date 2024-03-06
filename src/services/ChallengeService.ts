@@ -4,8 +4,9 @@ import { Response, Request } from "express";
 import { CustomRequest, IJwtPayload } from "../shared/Interface";
 
 export interface IChallengeService {
-  create(req: Request, res: Response): Promise<void>;
+  create(req: CustomRequest, res: Response): Promise<void>;
   get(req: Request, res: Response): Promise<void>;
+  getAll(req: Request, res: Response): Promise<void>;
   update(req: Request, res: Response): Promise<void>;
 }
 export class ChallengeService implements IChallengeService {
@@ -19,8 +20,10 @@ export class ChallengeService implements IChallengeService {
       const data: any = req.body;
       const user: IJwtPayload = req.user as IJwtPayload;
       const challenge: any = await this.challengeRepo.create({
-        userId: user.userId,
-        ...data,
+        data: {
+          userId: user.userId,
+          ...data,
+        },
       });
       res.status(201).json({ challenge, error: false, message: "success" });
     } catch (error) {

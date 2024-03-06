@@ -33,6 +33,7 @@ model Challenge {
   id                    String  @id @default(cuid())
   userId                String
   projectMintAddress    String?
+  description           String?
   projectId             String?
   projectTransactionId  String?
   nftId                 String?

@@ -12,27 +12,11 @@ export interface IUserService {
   getUserByEmail(req: Request, res: Response): Promise<void>;
 }
 export class UserService implements IUserService {
-  private userRepo: IBase;
-  private challengeRepo: IBase;
-  private storyRepo: IBase;
-  private transactionRepo: IBase;
-  private authService: IAuth;
-  private errorService: IErrorService;
   constructor(
-    userRepo: IBase,
-    challengeRepo: IBase,
-    storyRepo: IBase,
-    transactionRepo: IBase,
-    authService: IAuth,
-    errorService: IErrorService
-  ) {
-    this.userRepo = userRepo;
-    this.challengeRepo = challengeRepo;
-    this.storyRepo = storyRepo;
-    this.transactionRepo = transactionRepo;
-    this.authService = authService;
-    this.errorService = errorService;
-  }
+    private userRepo: IBase,
+    private authService: IAuth,
+    private errorService: IErrorService
+  ) {}
 
   public register = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -134,7 +118,7 @@ export class UserService implements IUserService {
       this.errorService.handleErrorResponse(error)(res);
     }
   };
-  
+
   public getUserByEmail = async (
     req: Request,
     res: Response
