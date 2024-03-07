@@ -16,6 +16,10 @@ ChallengeController.get(
   challengeServiceFactory.getAll
 );
 ChallengeController.get(
+  "/",
+  challengeServiceFactory.getAll
+);
+ChallengeController.get(
   "/id/:id",
   middelwareServiceFactory.verfyToken,
   challengeServiceFactory.get
