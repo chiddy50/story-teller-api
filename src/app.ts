@@ -4,6 +4,8 @@ import UserController from "./controllers/User";
 import dotenv from "dotenv";
 import cors from 'cors';
 import ChallengeController from "./controllers/Challenge";
+import TransactionController from "./controllers/Transaction";
+import StoryController from "./controllers/Story";
 dotenv.config();
 
 const app = express();
@@ -14,6 +16,8 @@ app.use(express.json());
 
 app.use("/", UserController);
 app.use("/challenges", ChallengeController);
+app.use("/transaction", TransactionController);
+app.use("/story", StoryController);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

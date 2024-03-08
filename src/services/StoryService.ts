@@ -4,9 +4,10 @@ import { Response, Request } from "express";
 import { CustomRequest, IJwtPayload } from "../shared/Interface";
 
 export interface IStoryService {
-  create(req: Request, res: Response): Promise<void>;
+  create(req: CustomRequest, res: Response): Promise<void>;
   get(req: Request, res: Response): Promise<void>;
-  update(req: Request, res: Response): Promise<void>;
+  getAll(req: CustomRequest, res: Response): Promise<void> 
+  update(req: CustomRequest, res: Response): Promise<void>;
 }
 export class StoryService implements IStoryService {
   constructor(
@@ -136,7 +137,7 @@ export class StoryService implements IStoryService {
     }
   };
 
-  public update = async (req: Request, res: Response): Promise<void> => {
+  public update = async (req: CustomRequest, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
       const updatedFields = req.body;
