@@ -11,12 +11,12 @@ ChallengeController.post(
   challengeServiceFactory.create
 );
 ChallengeController.get(
-  "/all",
+  "/",
   middelwareServiceFactory.verfyToken,
   challengeServiceFactory.getAll
 );
 ChallengeController.get(
-  "/",
+  "/all",
   challengeServiceFactory.getAll
 );
 ChallengeController.get(
