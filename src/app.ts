@@ -16,8 +16,8 @@ app.use(express.json());
 
 app.use("/", UserController);
 app.use("/challenges", ChallengeController);
-app.use("/transaction", TransactionController);
-app.use("/story", StoryController);
+app.use("/transactions", TransactionController);
+app.use("/stories", StoryController);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
