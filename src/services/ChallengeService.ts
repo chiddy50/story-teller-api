@@ -7,6 +7,7 @@ export interface IChallengeService {
   create(req: CustomRequest, res: Response): Promise<void>;
   get(req: Request, res: Response): Promise<void>;
   getAll(req: Request, res: Response): Promise<void>;
+  getAllUserChallenges(req: Request, res: Response): Promise<void>;  
   update(req: Request, res: Response): Promise<void>;
 }
 export class ChallengeService implements IChallengeService {
@@ -61,7 +62,24 @@ export class ChallengeService implements IChallengeService {
         },
       });
 
-      res.status(201).json({ challenges, error: false, message: "success" });
+      res.status(200).json({ challenges, error: false, message: "success" });
+    } catch (error) {
+      this.errorService.handleErrorResponse(error)(res);
+    }
+  };
+
+  public getAllUserChallenges = async (req: any, res: Response): Promise<void> => {
+    try {
+      const user: IJwtPayload = req.user as IJwtPayload;
+
+      const challenges: any = await this.challengeRepo.getAll({
+        where: { userId: user.userId },
+        include: {
+          stories: true,
+        },
+      });
+
+      res.status(200).json({ challenges, error: false, message: "success" });
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);
     }

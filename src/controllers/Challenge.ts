@@ -13,7 +13,7 @@ ChallengeController.post(
 ChallengeController.get(
   "/",
   middelwareServiceFactory.verfyToken,
-  challengeServiceFactory.getAll
+  challengeServiceFactory.getAllUserChallenges
 );
 ChallengeController.get(
   "/all",
