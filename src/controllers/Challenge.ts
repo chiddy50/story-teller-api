@@ -21,7 +21,6 @@ ChallengeController.get(
 );
 ChallengeController.get(
   "/id/:id",
-  middelwareServiceFactory.verfyToken,
   challengeServiceFactory.get
 );
 
