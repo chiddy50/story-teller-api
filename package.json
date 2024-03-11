@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc",
-    "dev": "npx tsc && nodemon dist/app.js",
+    "dev": "npx prisma generate && npx tsc && nodemon dist/app.js",
     "start": "node dist/app.js"
   },
   "keywords": [],

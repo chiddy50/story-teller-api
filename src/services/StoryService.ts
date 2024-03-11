@@ -122,9 +122,13 @@ export class StoryService implements IStoryService {
   public getAll = async (req: CustomRequest, res: Response): Promise<void> => {
     try {
       const user: IJwtPayload = req.user as IJwtPayload;
+
+      const challengeId = req.query.challengeId
+      
       const stories: any = await this.storyRepo.getAll({
         where: {
-          userId: user.userId,
+          // userId: user.userId,
+          ...(challengeId && { challengeId: challengeId })
         },
         include: {
           challenge: true,
