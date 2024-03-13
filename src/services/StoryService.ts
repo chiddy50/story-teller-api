@@ -133,6 +133,7 @@ export class StoryService implements IStoryService {
         },
         include: {
           challenge: true,
+          user: true
         },
       });
 
@@ -152,6 +153,7 @@ export class StoryService implements IStoryService {
         },
         include: {
           challenge: true,
+          user: true
         },
       });
 
