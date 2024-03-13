@@ -13,7 +13,7 @@ StoryController.post(
 StoryController.get(
   "/",
   middelwareServiceFactory.verfyToken,
-  storyServiceFactory.getAll
+  storyServiceFactory.getAllUserStories
 );
 StoryController.get(
   "/all",

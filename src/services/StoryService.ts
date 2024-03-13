@@ -6,7 +6,8 @@ import { CustomRequest, IJwtPayload } from "../shared/Interface";
 export interface IStoryService {
   create(req: CustomRequest, res: Response): Promise<void>;
   get(req: Request, res: Response): Promise<void>;
-  getAll(req: CustomRequest, res: Response): Promise<void> 
+  getAll(req: CustomRequest, res: Response): Promise<void>; 
+  getAllUserStories(req: CustomRequest, res: Response): Promise<void>; 
   update(req: CustomRequest, res: Response): Promise<void>;
 }
 export class StoryService implements IStoryService {
@@ -129,6 +130,25 @@ export class StoryService implements IStoryService {
         where: {
           // userId: user.userId,
           ...(challengeId && { challengeId: challengeId })
+        },
+        include: {
+          challenge: true,
+        },
+      });
+
+      res.status(201).json({ stories, error: false, message: "success" });
+    } catch (error) {
+      this.errorService.handleErrorResponse(error)(res);
+    }
+  };
+
+  public getAllUserStories = async (req: CustomRequest, res: Response): Promise<void> => {
+    try {
+      const user: IJwtPayload = req.user as IJwtPayload;
+      
+      const stories: any = await this.storyRepo.getAll({
+        where: {
+          userId: user.userId
         },
         include: {
           challenge: true,
