@@ -141,4 +141,44 @@ export class UserService implements IUserService {
       this.errorService.handleErrorResponse(error)(res);
     }
   };
+
+  public getUserStoryRankings = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const awardedUsers: any = await this.userRepo.getAll({
+        where: {
+          stories: {
+            some: {
+              award: 'FIRST' // Filter stories with FIRST place award
+            }
+          }
+        },
+        include: {
+          stories: {
+            where: {
+              award: 'FIRST' // Filter only FIRST place stories for each user
+            }
+          }
+        },
+        orderBy: {
+          'stories_count': 'desc' // Order users by the number of FIRST place stories
+        },
+        select: {
+          id: true,
+          name: true,
+          stories_count: {
+            count: {
+              where: {
+                award: 'FIRST' // Count only FIRST place stories for each user
+              }
+            }
+          }
+        }
+      });
+      
+      res.status(201).json({ awardedUsers, error: false, message: "success" });
+    } catch (error) {
+      this.errorService.handleErrorResponse(error)(res);      
+    }
+    
+  }
 }
