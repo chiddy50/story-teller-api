@@ -63,9 +63,12 @@ model Story {
   nftTransactionId      String?
   projectId             String?
   amountPaid            String?
+  amountPending         String?
   paidAt                DateTime?
+  awardedAt             DateTime?
   createdAt             DateTime     @default(now())
   award                 Award?
+
   user                  User @relation(fields: [userId], references: [id], onDelete: Cascade)
   challenge             Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
 }
@@ -74,12 +77,12 @@ model Transaction {
   id                    String    @id @default(cuid())
   userId                String
   challengeId           String?
-  transactionFee        String
-  transactionFeeSol     String
+  transactionFee        String?
+  transactionFeeSol     String?
   totalCharge           String
-  totalChargeSol        String
+  totalChargeSol        String?
   status                TransactionStatus @default(PENDING)  
-  challenge             Challenge[]
+  challenges            Challenge[]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
