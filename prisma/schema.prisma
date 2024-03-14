@@ -65,7 +65,7 @@ model Story {
   amountPaid            String?
   // amountPending         String?
   paidAt                DateTime?
-  awardedAt             DateTime?
+  // awardedAt             DateTime?
   createdAt             DateTime     @default(now())
   award                 Award?
 
