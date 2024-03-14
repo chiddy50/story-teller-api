@@ -8,6 +8,5 @@ UserController.post("/register", userServiceFactory.register);
 UserController.post("/login", userServiceFactory.login);
 UserController.get("/id/:id", userServiceFactory.getUserById);
 UserController.get("/email/:email", userServiceFactory.getUserByEmail);
-UserController.get("/rankings", userServiceFactory.getUserStoryRankings);
 
 export default UserController;
