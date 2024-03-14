@@ -63,7 +63,7 @@ model Story {
   nftTransactionId      String?
   projectId             String?
   amountPaid            String?
-  amountPending         String?
+  // amountPending         String?
   paidAt                DateTime?
   awardedAt             DateTime?
   createdAt             DateTime     @default(now())
