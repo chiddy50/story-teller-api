@@ -152,13 +152,13 @@ export class UserService implements IUserService {
             }
           }
         },
-        include: {
-          stories: {
-            where: {
-              award: 'FIRST' // Filter only FIRST place stories for each user
-            }
-          }
-        },
+        // include: {
+        //   stories: {
+        //     where: {
+        //       award: 'FIRST' // Filter only FIRST place stories for each user
+        //     }
+        //   }
+        // },
         orderBy: {
           'stories_count': 'desc' // Order users by the number of FIRST place stories
         },
@@ -171,6 +171,11 @@ export class UserService implements IUserService {
                 award: 'FIRST' // Count only FIRST place stories for each user
               }
             }
+          }
+        },
+        stories: { // Include stories with FIRST place award
+          where: {
+            award: 'FIRST' // Filter only FIRST place stories for each user
           }
         }
       });
