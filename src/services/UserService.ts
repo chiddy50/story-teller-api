@@ -145,41 +145,29 @@ export class UserService implements IUserService {
   public getUserStoryRankings = async (req: Request, res: Response): Promise<void> => {
     try {
       const awardedUsers: any = await this.userRepo.getAll({
-        where: {
-          stories: {
-            some: {
-              award: 'FIRST' // Filter stories with FIRST place award
-            }
-          }
-        },
-        // include: {
-        //   stories: {
-        //     where: {
-        //       award: 'FIRST' // Filter only FIRST place stories for each user
-        //     }
-        //   }
-        // },
-        orderBy: {
-          'stories_count': 'desc' // Order users by the number of FIRST place stories
-        },
         select: {
           id: true,
           name: true,
-          stories_count: {
-            count: {
-              where: {
-                award: 'FIRST' // Count only FIRST place stories for each user
-              }
+          stories: {
+            where: {
+              award: 'FIRST'
             }
           }
         },
-        stories: { // Include stories with FIRST place award
-          where: {
-            award: 'FIRST' // Filter only FIRST place stories for each user
-          }
+        include: {
+          stories: true
         }
       });
-      
+
+      // Calculate the count of stories with award 'FIRST' for each user
+      awardedUsers.forEach((user: any) => {
+        user.stories_count = user.stories.length;
+        delete user.stories; // Remove stories array from the response
+      });
+
+      // Sort users by the number of stories with award 'FIRST' in descending order
+      awardedUsers.sort((a: any, b: any) => b.stories_count - a.stories_count);
+
       res.status(201).json({ awardedUsers, error: false, message: "success" });
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);      
