@@ -16,6 +16,7 @@ enum Award {
   FIRST
   SECOND
   THIRD
+  RECOGNIZED
 }
 
 enum UserRole {
@@ -33,12 +34,13 @@ model Challenge {
   id                    String  @id @default(cuid())
   userId                String
   projectMintAddress    String?
-  description           String?
+  transactionPublicId   String?
   projectId             String?
   projectTransactionId  String?
   nftId                 String?
   nftTransactionId      String?
   title                 String
+  description           String?
   image                 String
   date                  String
   time                  String
@@ -63,9 +65,9 @@ model Story {
   nftTransactionId      String?
   projectId             String?
   amountPaid            String?
-  // amountPending         String?
+  amountPending         String?
   paidAt                DateTime?
-  // awardedAt             DateTime?
+  awardedAt             DateTime?
   createdAt             DateTime     @default(now())
   award                 Award?
 
@@ -74,29 +76,41 @@ model Story {
 }
 
 model Transaction {
-  id                    String    @id @default(cuid())
-  userId                String
-  challengeId           String?
-  transactionFee        String?
-  transactionFeeSol     String?
-  totalCharge           String
-  totalChargeSol        String?
-  status                TransactionStatus @default(PENDING)  
-  challenges            Challenge[]
+  id                      String    @id @default(cuid())
+  userId                  String
+  challengeId             String?
+  transactionPublicId     String?
+  percentage              String?
+  tenPercentFee           String?
+  tenPercentFeeInSol      String?
+  totalChargeInSol        String?
+  totalChargePlusFeeInSol String?
+  totalCharge             String?
+  totalChargePlusFee      String?
+  message                 String?
+  currency                String?
+  symbol                  String? 
+  status                  TransactionStatus @default(PENDING)  
+  challenges              Challenge[]
+  createdAt               DateTime     @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id                    String    @id @default(cuid())
-  name                  String?
-  password              String?
-  email                 String?   @unique
-  emailVerified         DateTime?
-  publicKey             String?
+  id                        String    @id @default(cuid())
+  name                      String?
+  password                  String?
+  email                     String?   @unique
+  emailVerified             DateTime?
+  publicKey                 String?
+  primaryWalletAddress      String?
+  publicId                  String? @unique
 
-  challenges            Challenge[]
-  transactions          Transaction[]
-  stories               Story[]
-  role                  UserRole? @default(ADMIN)
+  createdAt                 DateTime     @default(now())
+
+  role                      UserRole? @default(ADMIN)
+  challenges                Challenge[]
+  transactions              Transaction[]
+  stories                   Story[]
 }

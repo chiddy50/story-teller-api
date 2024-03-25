@@ -4,12 +4,14 @@ import { IErrorService } from "../shared/ErrorService";
 import { Response, Request } from "express";
 import { RoleTypes } from "../shared/enum";
 import * as R from "ramda";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 export interface IUserService {
   register(req: Request, res: Response): Promise<void>;
   login(req: Request, res: Response): Promise<void>;
   getUserById(req: Request, res: Response): Promise<void>;
   getUserByEmail(req: Request, res: Response): Promise<void>;
+  createNewUser(req: Request, res: Response): Promise<void>;
 }
 export class UserService implements IUserService {
   constructor(
@@ -142,36 +144,43 @@ export class UserService implements IUserService {
     }
   };
 
-  public getUserStoryRankings = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const awardedUsers: any = await this.userRepo.getAll({
-        select: {
-          id: true,
-          name: true,
-          stories: {
-            where: {
-              award: 'FIRST'
-            }
-          }
-        },
-        include: {
-          stories: true
-        }
-      });
-
-      // Calculate the count of stories with award 'FIRST' for each user
-      awardedUsers.forEach((user: any) => {
-        user.stories_count = user.stories.length;
-        delete user.stories; // Remove stories array from the response
-      });
-
-      // Sort users by the number of stories with award 'FIRST' in descending order
-      awardedUsers.sort((a: any, b: any) => b.stories_count - a.stories_count);
-
-      res.status(201).json({ awardedUsers, error: false, message: "success" });
-    } catch (error) {
-      this.errorService.handleErrorResponse(error)(res);      
-    }
+  public createNewUser = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     
+    try {
+      const { publicAddress, username, email, id } = req.body;
+
+      const existingUser: any = await this.userRepo.getUnique({
+        where: { email },        
+      });
+
+      if (!existingUser) {
+        const user: any = await this.userRepo.create({
+          data: {
+            email,
+            primaryWalletAddress: publicAddress,
+            name: username,
+            publicId: id          
+          }
+        });        
+        res.status(201).json({ data: user, error: false, message: "New user created" });      
+      }else{
+        const user: any = await this.userRepo.update({
+          where: { id: existingUser?.id },
+          data: {
+            primaryWalletAddress: publicAddress, 
+            name: username, 
+            email
+          }
+        });
+
+        res.status(200).json({ data: user, error: false, message: "User updated" });        
+      }
+      
+    } catch (error) {
+      this.errorService.handleErrorResponse(error)(res);
+    }
   }
 }

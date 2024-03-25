@@ -3,9 +3,10 @@ import {
   IChallengeService,
 } from "../services/ChallengeService";
 import { errorService } from "./ErrorServiceFactory";
-import { challengeRepository } from "./RepositoryFactory";
+import { challengeRepository, transactionRepository } from "./RepositoryFactory";
 
 export const challengeServiceFactory: IChallengeService = new ChallengeService(
   challengeRepository,
-  errorService
+  transactionRepository,
+  errorService,
 );

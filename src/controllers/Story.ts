@@ -7,22 +7,22 @@ import { storyServiceFactory } from "../factories/StoryServiceFactory";
 const StoryController: Router = express.Router();
 StoryController.post(
   "/create",
-  middelwareServiceFactory.verfyToken,
+  middelwareServiceFactory.verfyToken2,
   storyServiceFactory.create
 );
 StoryController.get(
   "/",
-  middelwareServiceFactory.verfyToken,
+  middelwareServiceFactory.verfyToken2,
   storyServiceFactory.getAllUserStories
 );
 StoryController.get(
   "/all",
-  middelwareServiceFactory.verfyToken,
+  middelwareServiceFactory.verfyToken2,
   storyServiceFactory.getAll
 );
 StoryController.get(
   "/id/:id",
-  middelwareServiceFactory.verfyToken,
+  middelwareServiceFactory.verfyToken2,
   storyServiceFactory.get
 );
 StoryController.put(

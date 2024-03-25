@@ -18,13 +18,15 @@ export class TransactionService implements ITransactionService {
     try {
       const data: any = req.body;
       const user: IJwtPayload = req.user as IJwtPayload;
-      const challenge: any = await this.transactionRepo.create({
+      console.log({user, data});
+
+      const transaction: any = await this.transactionRepo.create({
         data: {
-          userId: user.userId,
+          userId: user.id,
           ...data,
         },
       });
-      res.status(201).json({ challenge, error: false, message: "success" });
+      res.status(201).json({ transaction, error: false, message: "success" });
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);
     }

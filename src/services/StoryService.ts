@@ -29,29 +29,29 @@ export class StoryService implements IStoryService {
 
       if (!getChallenge) throw new Error("Challenge not found");
 
-      if (data.userAddress) {
-        await this.userRepo.update({
-          where: { id: user.userId },
-          data: {
-            publicKey: data.userAddress,
-          },
-        });
-      } else {
-        const getUser = this.userRepo.getUnique({
-          where: {
-            id: user.userId,
-            NOT: {
-              publicKey: null,
-            },
-          },
-        });
+      // if (data.userAddress) {
+      //   await this.userRepo.update({
+      //     where: { id: user.id },
+      //     data: {
+      //       publicKey: data.userAddress,
+      //     },
+      //   });
+      // } else {
+      //   const getUser = this.userRepo.getUnique({
+      //     where: {
+      //       id: user.userId,
+      //       NOT: {
+      //         publicKey: null,
+      //       },
+      //     },
+      //   });
 
-        if (!getUser) throw new Error("user not found");
-      }
+      //   if (!getUser) throw new Error("user not found");
+      // }
 
       const newStory: any = await this.storyRepo.create({
         data: {
-          userId: user.userId,
+          userId: user.id,
           challengeId: data.challengeId,
           story: data.story,
           projectId: getChallenge?.projectId,
@@ -146,18 +146,29 @@ export class StoryService implements IStoryService {
   public getAllUserStories = async (req: CustomRequest, res: Response): Promise<void> => {
     try {
       const user: IJwtPayload = req.user as IJwtPayload;
-      
+      const { page = 1, limit } = req.query;
+      const parsedPage: number = parseInt(page as string, 10); 
+      const parsedLimit: number = parseInt(limit as string, 10);
+
+      let filter: object = { userId: user?.id };
+      const totalCount: number = await this.storyRepo.count(filter);
+      const offset = (parsedPage - 1) * parsedLimit;
+
       const stories: any = await this.storyRepo.getAll({
-        where: {
-          userId: user.userId
-        },
+        where: filter,
         include: {
           challenge: true,
           user: true
         },
+        skip: Number(offset),
+        take: Number(limit),
       });
 
-      res.status(201).json({ stories, error: false, message: "success" });
+      const totalPages: number = Math.ceil(totalCount / parsedLimit);
+      const hasNextPage: boolean = parsedPage < totalPages;
+      const hasPrevPage: boolean = parsedPage > 1;
+
+      res.status(201).json({ stories, totalPages, hasNextPage, hasPrevPage, error: false, message: "success" });
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);
     }

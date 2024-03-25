@@ -13,19 +13,41 @@ export interface IChallengeService {
 export class ChallengeService implements IChallengeService {
   constructor(
     private challengeRepo: IBase,
+    private transactionRepo: IBase,
     private errorService: IErrorService
   ) {}
 
   public create = async (req: CustomRequest, res: Response): Promise<void> => {
     try {
-      const data: any = req.body;
+      const { currency, date, description, image, nftId, nftTransactionId, price, projectId, symbol, time, title, transactionPublicId }: any = req.body;
+
+      const payload = { currency, date, description, image, nftId, nftTransactionId, price, projectId, symbol, time, title, transactionPublicId }
+
       const user: IJwtPayload = req.user as IJwtPayload;
+
       const challenge: any = await this.challengeRepo.create({
         data: {
-          userId: user.userId,
-          ...data,
+          userId: user.id,
+          ...payload,
         },
       });
+
+      if (transactionPublicId) {
+        // const transaction = await this.transactionRepo.getUnique({
+        //   where: { transactionPublicId },
+        // });
+        
+        // if (transaction) {
+        //   const transactionUpdated = await this.transactionRepo.update({
+        //     where: { transactionPublicId },
+        //     data: {
+        //       challengeId: challenge.id
+        //     }
+        //   });
+        // }
+
+      }
+
       res.status(201).json({ challenge, error: false, message: "success" });
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);
@@ -50,19 +72,32 @@ export class ChallengeService implements IChallengeService {
 
   public getAll = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { id } = req.query;
+      const { id, page = 1, limit } = req.query;
+      const parsedId: string | undefined = typeof id === 'string' ? id : undefined;
+      const parsedPage: number = parseInt(page as string, 10);
+      const parsedLimit: number = parseInt(limit as string, 10);
+
       let filter: object = {};
-      if (id) {
-        filter = { userId: id };
+      if (parsedId) {
+        filter = { userId: parsedId };
       }
+      const totalCount: number = await this.challengeRepo.count(filter); // Assuming you have a method to count total challenges
+      const offset = (parsedPage - 1) * parsedLimit;
+
       const challenges: any = await this.challengeRepo.getAll({
         where: filter,
         include: {
           stories: true,
         },
+        skip: Number(offset),
+        take: Number(limit),
       });
 
-      res.status(200).json({ challenges, error: false, message: "success" });
+      const totalPages: number = Math.ceil(totalCount / parsedLimit);
+      const hasNextPage: boolean = parsedPage < totalPages;
+      const hasPrevPage: boolean = parsedPage > 1;
+
+      res.status(200).json({ challenges, totalPages, hasNextPage, hasPrevPage, error: false, message: "success" });
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);
     }
@@ -71,15 +106,31 @@ export class ChallengeService implements IChallengeService {
   public getAllUserChallenges = async (req: any, res: Response): Promise<void> => {
     try {
       const user: IJwtPayload = req.user as IJwtPayload;
+      
+      const { page = 1, limit } = req.query;
+      const parsedPage: number = parseInt(page as string, 10); 
+      const parsedLimit: number = parseInt(limit as string, 10); 
 
+      let filter: object = { userId: user?.id };
+
+      const totalCount: number = await this.challengeRepo.count(filter); // Assuming you have a method to count total challenges
+      const offset = (parsedPage - 1) * parsedLimit;
+      
       const challenges: any = await this.challengeRepo.getAll({
-        where: { userId: user.userId },
+        where: filter,
         include: {
           stories: true,
         },
+        skip: Number(offset),
+        take: Number(limit),
       });
 
-      res.status(200).json({ challenges, error: false, message: "success" });
+      const totalPages: number = Math.ceil(totalCount / parsedLimit);
+      const hasNextPage: boolean = parsedPage < totalPages;
+      const hasPrevPage: boolean = parsedPage > 1;
+
+      res.status(200).json({ challenges, totalPages, hasNextPage, hasPrevPage, error: false, message: "success" });
+
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);
     }
