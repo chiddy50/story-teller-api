@@ -105,6 +105,9 @@ export class ChallengeService implements IChallengeService {
             },
           },
         },
+        orderBy: {
+          createdAt: 'desc'
+        },
         skip: Number(offset),
         take: Number(limit),
       });
@@ -152,6 +155,9 @@ export class ChallengeService implements IChallengeService {
               stories: true,
             },
           },
+        },
+        orderBy: {
+          createdAt: 'desc'
         },
         skip: Number(offset),
         take: Number(limit),
