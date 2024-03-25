@@ -72,7 +72,7 @@ export class ChallengeService implements IChallengeService {
 
   public getAll = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { id, page = 1, limit } = req.query;
+      const { id, page = 1, limit, duration, from, to } = req.query;
       const parsedId: string | undefined = typeof id === 'string' ? id : undefined;
       const parsedPage: number = parseInt(page as string, 10);
       const parsedLimit: number = parseInt(limit as string, 10);
@@ -87,7 +87,23 @@ export class ChallengeService implements IChallengeService {
       const challenges: any = await this.challengeRepo.getAll({
         where: filter,
         include: {
-          stories: true,
+          user: {
+            select: {
+              id: true,
+              name: true
+            },
+          },
+          stories: {
+            select: {
+              id: true,
+              award: true
+            },
+          },
+          _count: {
+            select: {
+              stories: true,
+            },
+          },
         },
         skip: Number(offset),
         take: Number(limit),
@@ -119,7 +135,23 @@ export class ChallengeService implements IChallengeService {
       const challenges: any = await this.challengeRepo.getAll({
         where: filter,
         include: {
-          stories: true,
+          user: {
+            select: {
+              id: true,
+              name: true
+            },
+          },
+          stories: {
+            select: {
+              id: true,
+              award: true
+            },
+          },
+          _count: {
+            select: {
+              stories: true,
+            },
+          },
         },
         skip: Number(offset),
         take: Number(limit),
