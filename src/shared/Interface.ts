@@ -3,7 +3,7 @@ export interface IJwtPayload {
   id?: string;
   userId?: string;
   name: string;
-  role: string;
+  role?: string;
 }
 
 export interface CustomRequest extends Request {

@@ -61,6 +61,7 @@ export class MiddlewareService implements IMiddlewareService {
       const publicKey = `-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtzg4VFYxS4liX6/ZumLmcNi8m/RpGMKB/MaubI8/NkBCgQJE7CMOCqQmKMYzpb9FrOVqyuEpIqz/HFaTawsiTzB0+KlzOTIBaMeWHETY7oJc4XSu/KTtSx+d6uVMaZEvdFiRv6V2h4q+0gaVexzaoeek/SdnQBPRVxqYzkuSsvTIkQH6+aMecTGR0Pa1wm0QormnyhIzt0DjS6u/rFMqODy3RCXiwW5huuU2kjPKY6+mMxTFIpxhOBoO0DyRDWR3RRiBd9ocF+mt+U6+8ONtGIII49MpUyItZgjgIA8wf3MHsGGLCY2SuW5rIj2WaFE8olWBNPcrBVnuCtGYn3NgxXSMjsuqG5/bJN2CPK3PH/hse0v2IMkCDvRR5xrAPu+6+vaPeNCKg5tJ8zNgN7V398+Wb/+xQDC30PIlJE9UPubW01bCxqttFnZP0X+XzUJ6lEiHZjWkAlY4wNfdaNfFEFAWCy4KLyyODpwEt+54ZfcsiygUZtVOiUTjQwGaFSsm4v4dY2QbkmRKUs5ftj7OzcjeRKBQFsSKHNib1RulfuJ/ERRDky/Shn/9ACdQ7EyP5FMgnDc6yOJ4wMyK5pkrVoz8hYMn/OnmM+XgWkVoWckk9JjzfQ9WLiftpFQ1xiZ5dfF29t1otE7ERyv3JFes0POJOQiKikN3ZHNrGqnEemsCAwEAAQ==
 -----END PUBLIC KEY-----`;    
+console.log({publicKey});
 
       jwt.verify(token, publicKey, { algorithms: ['RS256'] }, async (err: any, decodedToken:  JwtPayload | string | undefined) => {
         if (err || decodedToken === undefined) {
@@ -84,7 +85,6 @@ MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtzg4VFYxS4liX6/ZumLmcNi8m/RpGMKB/Mau
         const isNew = decodedToken && decodedToken.iat ? (decodedToken.iat > now - 60) : false; // Check if decodedToken and decodedToken.iat are defined before comparing
 
         const { email, new_user, username } = decodedToken
-        console.log({decodedToken});
         
 
         let auth_user: any = null
@@ -98,7 +98,7 @@ MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtzg4VFYxS4liX6/ZumLmcNi8m/RpGMKB/Mau
         });
 
         if (auth_user) {
-          console.log("EXISITNG USER FOUND....", {new_user});
+          // console.log("EXISITNG USER FOUND....", {new_user});
 
           req["user"] = auth_user;
           next();          
@@ -118,7 +118,7 @@ MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtzg4VFYxS4liX6/ZumLmcNi8m/RpGMKB/Mau
               publicKey: true,
             },
           });
-          console.log("USER NOT FOUND, CREATING....", {new_user});
+          // console.log("USER NOT FOUND, CREATING....", {new_user});
           
           req["user"] = new_user;
           next();
@@ -128,6 +128,8 @@ MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtzg4VFYxS4liX6/ZumLmcNi8m/RpGMKB/Mau
       });
 
     } catch (error: any) {
+      console.log(error);
+      
       this.errorService.handleErrorResponse(error.message)(res);
     }
   };

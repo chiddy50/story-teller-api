@@ -27,7 +27,7 @@ StoryController.get(
 );
 StoryController.put(
   "/id/:id",
-  middelwareServiceFactory.verfyToken,
+  middelwareServiceFactory.verfyToken2,
   storyServiceFactory.update
 );
 

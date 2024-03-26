@@ -66,7 +66,9 @@ export class StoryService implements IStoryService {
   public get = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
+
       if (!id) throw new Error("Invalid id");
+
       const story: any = await this.storyRepo.get({
         where: {
           id: id,
@@ -107,11 +109,20 @@ export class StoryService implements IStoryService {
         },
       });
 
+      const recognized_story: any = await this.storyRepo.get({
+        where: {
+          challengeId: story.challengeId,
+          award: "RECOGNIZED",
+        },
+      });
+      
+
       let response = {
         submission: story,
         first_place_story,
         second_place_story,
         third_place_story,
+        recognized_story
       };
 
       res.status(201).json({ response, error: false, message: "success" });
@@ -178,13 +189,18 @@ export class StoryService implements IStoryService {
     try {
       const { id } = req.params;
       const updatedFields = req.body;
+      const user: IJwtPayload = req.user as IJwtPayload;
+      
       if (!id) throw new Error("Invalid id");
 
-      const story = await this.storyRepo.get({
+      const story: any = await this.storyRepo.get({
         where: { id },
+        include: { challenge: true }
       });
 
-      if (!story) throw new Error("Challenge not found");
+      if (!story) throw new Error("Story not found");
+ 
+      if (story?.challenge?.userId !== user?.id) throw new Error("Unauthorized action");
 
       const updateStory: any = await this.storyRepo.update({
         where: { id },
