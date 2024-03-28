@@ -9,3 +9,11 @@ export interface IJwtPayload {
 export interface CustomRequest extends Request {
   user?: IJwtPayload;
 }
+export interface GetChallengeQueryParameters {
+  id?: string;
+  page?: number|string;
+  limit?: number|string;
+  type?: 'expired' | 'active' | 'all';
+  from?: string;
+  to?: string;
+}

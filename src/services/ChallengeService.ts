@@ -1,7 +1,7 @@
 import { IBase } from "../respositories/BaseRespository";
 import { IErrorService } from "../shared/ErrorService";
 import { Response, Request } from "express";
-import { CustomRequest, IJwtPayload } from "../shared/Interface";
+import { CustomRequest, GetChallengeQueryParameters, IJwtPayload } from "../shared/Interface";
 
 export interface IChallengeService {
   create(req: CustomRequest, res: Response): Promise<void>;
@@ -10,6 +10,7 @@ export interface IChallengeService {
   getAllUserChallenges(req: Request, res: Response): Promise<void>;  
   update(req: Request, res: Response): Promise<void>;
 }
+
 export class ChallengeService implements IChallengeService {
   constructor(
     private challengeRepo: IBase,
@@ -71,38 +72,41 @@ export class ChallengeService implements IChallengeService {
   };
 
   public getAll = async (req: Request, res: Response): Promise<void> => {
+    
+    
     try {
-      const { id, page = 1, limit, duration, from, to } = req.query;
+      const { id, page = 1, limit, type, from, to }: GetChallengeQueryParameters = req.query;
       const parsedId: string | undefined = typeof id === 'string' ? id : undefined;
-      const parsedPage: number = parseInt(page as string, 10);
-      const parsedLimit: number = parseInt(limit as string, 10);
-
-      let filter: object = {};
+      const parsedPage: number = parseInt(String(page), 10);
+      const parsedLimit: number = parseInt(String(limit), 10);
+      
+      let filterOptions: object = {};
       if (parsedId) {
-        filter = { userId: parsedId };
+        filterOptions = { userId: parsedId };
       }
-      const totalCount: number = await this.challengeRepo.count(filter); // Assuming you have a method to count total challenges
+
+      if (type === 'expired' || type === 'active') {
+        const currentDate = new Date().toISOString();
+        filterOptions = {
+          ...filterOptions,
+          date: type === 'expired' ? { lte: currentDate } : { gt: currentDate },
+        };
+      }
+
+      const totalCount: number = await this.challengeRepo.count(filterOptions); // Assuming you have a method to count total challenges
       const offset = (parsedPage - 1) * parsedLimit;
 
       const challenges: any = await this.challengeRepo.getAll({
-        where: filter,
+        where: filterOptions,
         include: {
           user: {
-            select: {
-              id: true,
-              name: true
-            },
+            select: { id: true, name: true },
           },
           stories: {
-            select: {
-              id: true,
-              award: true
-            },
+            select: { id: true, award: true },
           },
           _count: {
-            select: {
-              stories: true,
-            },
+            select: { stories: true },
           },
         },
         orderBy: {
@@ -116,7 +120,14 @@ export class ChallengeService implements IChallengeService {
       const hasNextPage: boolean = parsedPage < totalPages;
       const hasPrevPage: boolean = parsedPage > 1;
 
-      res.status(200).json({ challenges, totalPages, hasNextPage, hasPrevPage, error: false, message: "success" });
+      res.status(200).json({ 
+        challenges, 
+        totalPages, 
+        hasNextPage, 
+        hasPrevPage, 
+        error: false, 
+        message: "success" 
+      });
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);
     }
