@@ -24,6 +24,11 @@ enum UserRole {
   USER
 }
 
+enum StoryType {
+  CUSTOM
+  TEMPLATE
+}
+
 enum TransactionStatus {
   PENDING
   SUCCESS
@@ -48,11 +53,12 @@ model Challenge {
   currency              String
   symbol                String 
   transactions          Transaction[]
+  storyTransactions     StoryTransaction[]
   stories               Story[]
+    
+  createdAt             DateTime     @default(now()) // New column for storing creation date and time
 
-  createdAt          DateTime     @default(now()) // New column for storing creation date and time
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
 }
 
@@ -68,17 +74,23 @@ model Story {
   amountPending         String?
   paidAt                DateTime?
   awardedAt             DateTime?
-  createdAt             DateTime     @default(now())
+  type                  String?
+  createdAt             DateTime @default(now())
   award                 Award?
+  published             Boolean?      
+  publishedAt           DateTime? 
 
   user                  User @relation(fields: [userId], references: [id], onDelete: Cascade)
   challenge             Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  transactions          Transaction[]
+  storyTransactions     StoryTransaction[]
 }
 
 model Transaction {
   id                      String    @id @default(cuid())
   userId                  String
   challengeId             String?
+  storyId                 String?
   transactionPublicId     String?
   percentage              String?
   tenPercentFee           String?
@@ -87,14 +99,36 @@ model Transaction {
   totalChargePlusFeeInSol String?
   totalCharge             String?
   totalChargePlusFee      String?
-  message                 String?
+  narration               String?
   currency                String?
   symbol                  String? 
-  status                  TransactionStatus @default(PENDING)  
-  challenges              Challenge[]
+  status                  TransactionStatus @default(PENDING)    
   createdAt               DateTime     @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge               Challenge? @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  story                   Story? @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+}
+
+model StoryTransaction {
+  id                      String    @id @default(cuid())
+  storyId                 String
+  userId                  String
+  challengeId             String?
+  transactionPublicId     String?
+  totalInSol              String?
+  total                   String?
+  currency                String?
+  symbol                  String? 
+  narration               String? 
+  status                  TransactionStatus @default(PENDING)    
+  createdAt               DateTime     @default(now())
+
+  story                   Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  user                    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge               Challenge? @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
 }
 
 model User {
@@ -106,11 +140,11 @@ model User {
   publicKey                 String?
   primaryWalletAddress      String?
   publicId                  String? @unique
-
   createdAt                 DateTime     @default(now())
 
   role                      UserRole? @default(ADMIN)
   challenges                Challenge[]
   transactions              Transaction[]
+  storyTransactions         StoryTransaction[]
   stories                   Story[]
 }

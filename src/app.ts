@@ -6,6 +6,7 @@ import cors from 'cors';
 import ChallengeController from "./controllers/Challenge";
 import TransactionController from "./controllers/Transaction";
 import StoryController from "./controllers/Story";
+import StoryTransactionController from "./controllers/StoryTransaction";
 dotenv.config();
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use("/", UserController);
 app.use("/challenges", ChallengeController);
 app.use("/transactions", TransactionController);
+app.use("/story/transaction", StoryTransactionController);
 app.use("/stories", StoryController);
 
 app.listen(port, () => {

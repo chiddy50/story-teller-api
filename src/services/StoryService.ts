@@ -79,7 +79,7 @@ export class StoryService implements IStoryService {
               id: true,
               name: true,
               email: true,
-              publicKey: true,
+              primaryWalletAddress: true,
             },
           },
           challenge: true,

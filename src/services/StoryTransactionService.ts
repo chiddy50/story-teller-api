@@ -6,11 +6,12 @@ import { CustomRequest, IJwtPayload } from "../shared/Interface";
 export interface ITransactionService {
   create(req: Request, res: Response): Promise<void>;
   get(req: Request, res: Response): Promise<void>;
+  getAll(req: Request, res: Response): Promise<void>;
   update(req: Request, res: Response): Promise<void>;
 }
-export class TransactionService implements ITransactionService {
+export class StoryTransactionService implements ITransactionService {
   constructor(
-    private transactionRepo: IBase,
+    private storyTransactionRepo: IBase,
     private errorService: IErrorService
   ) {}
 
@@ -19,13 +20,13 @@ export class TransactionService implements ITransactionService {
       const data: any = req.body;
       const user: IJwtPayload = req.user as IJwtPayload;
 
-      const transaction: any = await this.transactionRepo.create({
+      const storyTransaction: any = await this.storyTransactionRepo.create({
         data: {
           userId: user.id,
           ...data,
         },
       });
-      res.status(201).json({ transaction, error: false, message: "success" });
+      res.status(201).json({ storyTransaction, error: false, message: "success" });
     } catch (error) {
       this.errorService.handleErrorResponse(error)(res);
     }
@@ -35,7 +36,7 @@ export class TransactionService implements ITransactionService {
     try {
       const { id } = req.params;
       if (!id) throw new Error("Invalid id");
-      const challenge: any = await this.transactionRepo.get({
+      const challenge: any = await this.storyTransactionRepo.get({
         where: {
           id,
         },
@@ -54,7 +55,7 @@ export class TransactionService implements ITransactionService {
       if (id) {
         filter = { userId: id };
       }
-      const challenges: any = await this.transactionRepo.getAll({
+      const challenges: any = await this.storyTransactionRepo.getAll({
         where: filter,
         include: {
           stories: true,
@@ -73,13 +74,13 @@ export class TransactionService implements ITransactionService {
       const updatedFields = req.body;
       if (!id) throw new Error("Invalid id");
 
-      const challenge = await this.transactionRepo.get({
+      const challenge = await this.storyTransactionRepo.get({
         where: { projectId: id },
       });
 
       if (!challenge) throw new Error("Challenge not found");
 
-      const updateChallenge: any = await this.transactionRepo.update({
+      const updateChallenge: any = await this.storyTransactionRepo.update({
         where: { id },
         data: updatedFields,
       });

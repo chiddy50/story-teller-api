@@ -7,12 +7,12 @@ import { challengeServiceFactory } from "../factories/ChallengeServiceFactory";
 const ChallengeController: Router = express.Router();
 ChallengeController.post(
   "/create",
-  middelwareServiceFactory.verfyToken2,
+  middelwareServiceFactory.verfyToken,
   challengeServiceFactory.create
 );
 ChallengeController.get(
   "/",
-  middelwareServiceFactory.verfyToken2,
+  middelwareServiceFactory.verfyToken,
   challengeServiceFactory.getAllUserChallenges
 );
 ChallengeController.get(

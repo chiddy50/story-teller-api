@@ -15,6 +15,7 @@ export class ChallengeService implements IChallengeService {
   constructor(
     private challengeRepo: IBase,
     private transactionRepo: IBase,
+    private userRepo: IBase,
     private errorService: IErrorService
   ) {}
 
@@ -33,20 +34,17 @@ export class ChallengeService implements IChallengeService {
         },
       });
 
-      if (transactionPublicId) {
-        // const transaction = await this.transactionRepo.getUnique({
-        //   where: { transactionPublicId },
-        // });
-        
-        // if (transaction) {
-        //   const transactionUpdated = await this.transactionRepo.update({
-        //     where: { transactionPublicId },
-        //     data: {
-        //       challengeId: challenge.id
-        //     }
-        //   });
-        // }
+      const transaction: any = await this.transactionRepo.get({
+        where: { transactionPublicId },
+      });
 
+      if (transaction) {
+        const transactionUpdated = await this.transactionRepo.update({
+          where: { id: transaction?.id },
+          data: {
+            challengeId: challenge.id
+          }
+        });        
       }
 
       res.status(201).json({ challenge, error: false, message: "success" });
@@ -120,7 +118,31 @@ export class ChallengeService implements IChallengeService {
       const hasNextPage: boolean = parsedPage < totalPages;
       const hasPrevPage: boolean = parsedPage > 1;
 
+      const users: any = await this.userRepo.getAll({
+        select: {
+          id: true,
+          name: true,
+          _count: {
+            select: {
+              stories: {
+                where: {
+                  award: 'FIRST'
+                }
+              },
+            },
+          },
+        },
+        take: 10,
+      });
+
+      users.sort((a: any, b: any) => {
+        const countA = a._count.stories.length;
+        const countB = b._count.stories.length;
+        return countA - countB; // Change to b - a for descending order
+      });
+
       res.status(200).json({ 
+        users,
         challenges, 
         totalPages, 
         hasNextPage, 

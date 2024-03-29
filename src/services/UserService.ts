@@ -12,6 +12,7 @@ export interface IUserService {
   getUserById(req: Request, res: Response): Promise<void>;
   getUserByEmail(req: Request, res: Response): Promise<void>;
   createNewUser(req: Request, res: Response): Promise<void>;
+  getUserRanking(req: Request, res: Response): Promise<void>;  
 }
 export class UserService implements IUserService {
   constructor(
@@ -183,4 +184,42 @@ export class UserService implements IUserService {
       this.errorService.handleErrorResponse(error)(res);
     }
   }
+
+  public getUserRanking = async (req: Request, res: Response): Promise<void> => {
+        
+    try {
+      
+      const users: any = await this.userRepo.getAll({
+        select: {
+          id: true,
+          name: true,
+          _count: {
+            select: {
+              stories: {
+                where: {
+                  award: 'FIRST'
+                }
+              },
+            },
+          },
+        },
+        take: 10,
+      });
+
+      users.sort((a: any, b: any) => {
+        const countA = a._count.stories.length;
+        const countB = b._count.stories.length;
+        return countA - countB; // Change to b - a for descending order
+      });
+
+      res.status(200).json({ 
+        users,
+        error: false, 
+        message: "success" 
+      });
+
+    } catch (error) {
+      this.errorService.handleErrorResponse(error)(res);
+    }
+  };
 }

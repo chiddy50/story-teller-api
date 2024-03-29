@@ -7,27 +7,27 @@ import { transactionServiceFactory } from "../factories/TransactionServiceFactor
 const TransactionController: Router = express.Router();
 TransactionController.post(
   "/create",
-  middelwareServiceFactory.verfyToken2,
+  middelwareServiceFactory.verfyToken,
   transactionServiceFactory.create
 );
 TransactionController.get(
   "/",
-  middelwareServiceFactory.verfyToken2,
+  middelwareServiceFactory.verfyToken,
   transactionServiceFactory.getAll
 );
 TransactionController.get(
   "/all",
-  middelwareServiceFactory.verfyToken2,
+  middelwareServiceFactory.verfyToken,
   transactionServiceFactory.getAll
 );
 TransactionController.get(
   "/id/:id",
-  middelwareServiceFactory.verfyToken2,
+  middelwareServiceFactory.verfyToken,
   transactionServiceFactory.get
 );
 TransactionController.put(
   "/id/:id",
-  middelwareServiceFactory.verfyToken2,
+  middelwareServiceFactory.verfyToken,
   transactionServiceFactory.update
 );
 
