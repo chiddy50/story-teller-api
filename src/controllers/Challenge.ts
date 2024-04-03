@@ -23,5 +23,10 @@ ChallengeController.get(
   "/id/:id",
   challengeServiceFactory.get
 );
+ChallengeController.get(
+  "/top/winners",
+  challengeServiceFactory.getTopWinners
+);
+
 
 export default ChallengeController;

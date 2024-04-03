@@ -9,6 +9,6 @@ UserController.post("/login", userServiceFactory.login);
 UserController.get("/id/:id", userServiceFactory.getUserById);
 UserController.get("/email/:email", userServiceFactory.getUserByEmail);
 UserController.post("/create/user", userServiceFactory.createNewUser);
-UserController.post("/user/ranking", userServiceFactory.getUserRanking);
+UserController.get("/user/ranking", userServiceFactory.getUserRanking);
 
 export default UserController;

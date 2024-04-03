@@ -9,6 +9,7 @@ export interface IChallengeService {
   getAll(req: Request, res: Response): Promise<void>;
   getAllUserChallenges(req: Request, res: Response): Promise<void>;  
   update(req: Request, res: Response): Promise<void>;
+  getTopWinners(req: Request, res: Response): Promise<void>;
 }
 
 export class ChallengeService implements IChallengeService {
@@ -118,31 +119,7 @@ export class ChallengeService implements IChallengeService {
       const hasNextPage: boolean = parsedPage < totalPages;
       const hasPrevPage: boolean = parsedPage > 1;
 
-      const users: any = await this.userRepo.getAll({
-        select: {
-          id: true,
-          name: true,
-          _count: {
-            select: {
-              stories: {
-                where: {
-                  award: 'FIRST'
-                }
-              },
-            },
-          },
-        },
-        take: 10,
-      });
-
-      users.sort((a: any, b: any) => {
-        const countA = a._count.stories.length;
-        const countB = b._count.stories.length;
-        return countA - countB; // Change to b - a for descending order
-      });
-
       res.status(200).json({ 
-        users,
         challenges, 
         totalPages, 
         hasNextPage, 
@@ -231,4 +208,39 @@ export class ChallengeService implements IChallengeService {
       this.errorService.handleErrorResponse(error)(res);
     }
   };
+
+  public getTopWinners = async (req: Request, res: Response): Promise<void> => {
+    try{
+      const users: any = await this.userRepo.getAll({
+        select: {
+          id: true,
+          name: true,
+          _count: {
+            select: {
+              stories: {
+                where: {
+                  award: 'FIRST'
+                }
+              },
+            },
+          },
+        },
+        take: 10,
+      });
+
+      users.sort((a: any, b: any) => {
+        const countA = a._count.stories.length;
+        const countB = b._count.stories.length;
+        return countA - countB; // Change to b - a for descending order
+      });
+
+      res.status(200).json({ 
+        users,
+        error: false, 
+        message: "success" 
+      });
+    } catch (error) {
+      this.errorService.handleErrorResponse(error)(res);
+    }
+  }
 }
