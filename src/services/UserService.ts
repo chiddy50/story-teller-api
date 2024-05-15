@@ -14,6 +14,7 @@ export interface IUserService {
   createNewUser(req: Request, res: Response): Promise<void>;
   getUserRanking(req: Request, res: Response): Promise<void>;  
 }
+
 export class UserService implements IUserService {
   constructor(
     private userRepo: IBase,

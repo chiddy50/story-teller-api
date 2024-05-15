@@ -72,7 +72,6 @@ export class ChallengeService implements IChallengeService {
 
   public getAll = async (req: Request, res: Response): Promise<void> => {
     
-    
     try {
       const { id, page = 1, limit, type, from, to }: GetChallengeQueryParameters = req.query;
       const parsedId: string | undefined = typeof id === 'string' ? id : undefined;
